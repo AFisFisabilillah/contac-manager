@@ -31,13 +31,11 @@ public class UserServiceImpl implements UserService{
     @Transactional
     public void register(RegisterRequest request) {
         Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
-        if(violations.size() != 0){
+        if(violations.size() > 0){
             throw new ConstraintViolationException(violations);
         }
 
-        if(userRepository.existsById(request.getUsername())){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"username Already Exist");
-        }
+
 
         User user = new User();
         user.setName(request.getName());

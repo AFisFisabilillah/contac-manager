@@ -1,5 +1,7 @@
 package fizu.contac.management.model;
 
+import fizu.contac.management.repository.UserRepository;
+import fizu.contac.management.validation.annotation.Unique;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -10,6 +12,7 @@ import lombok.*;
 public class RegisterRequest {
     @NotBlank(message = "Username Harus di isi")
     @Size(max = 100)
+    @Unique(repository = UserRepository.class, fieldName = "username")
     private String username;
 
     @NotBlank
