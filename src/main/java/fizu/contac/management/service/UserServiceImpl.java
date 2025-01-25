@@ -2,6 +2,7 @@ package fizu.contac.management.service;
 
 import fizu.contac.management.entity.User;
 import fizu.contac.management.model.RegisterRequest;
+import fizu.contac.management.model.UserResponse;
 import fizu.contac.management.repository.UserRepository;
 import fizu.contac.management.security.BCrypt;
 import jakarta.transaction.Transactional;
@@ -43,4 +44,10 @@ public class UserServiceImpl implements UserService{
         user.setPassword(BCrypt.hashpw(request.getPassword(), BCrypt.gensalt()));
         userRepository.save(user);
     }
+
+    public UserResponse getUser(User user){
+        return UserResponse.builder().name(user.getName()).username(user.getUsername()).build();
+    }
+
+
 }

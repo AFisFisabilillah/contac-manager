@@ -4,6 +4,7 @@ package fizu.contac.management.service;
 import fizu.contac.management.entity.User;
 import fizu.contac.management.model.LoginRequest;
 import fizu.contac.management.model.TokenResponse;
+import fizu.contac.management.model.UserResponse;
 import fizu.contac.management.repository.UserRepository;
 import fizu.contac.management.security.BCrypt;
 import jakarta.transaction.Transactional;
@@ -35,6 +36,7 @@ public class AuthServiceImpl implements AuthService{
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Useraname or Password wrong");
         }
     }
+
 
     private Long next30Days(){
         return System.currentTimeMillis()+ 1000*60*24*30;

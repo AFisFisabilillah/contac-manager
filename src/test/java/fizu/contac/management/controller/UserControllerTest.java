@@ -2,6 +2,7 @@ package fizu.contac.management.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fizu.contac.management.entity.User;
 import fizu.contac.management.model.RegisterRequest;
 import fizu.contac.management.model.WebResponse;
 import fizu.contac.management.repository.UserRepository;
@@ -12,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.Assert;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -91,4 +93,32 @@ public class UserControllerTest {
                 status().isBadRequest()
         );
     }
+
+    @Test
+    void testGetUserSucces() throws Exception {
+        User user = new User();
+        user.setName("test");
+        user.setUsername("test");
+        user.setToken("test");
+        user.setTokenExpiredAt(System.currentTimeMillis() + 1000000000000L);
+        userRepository.save(user);
+        mockMvc.perform(
+                get("/api/profile").header("X-API-TOKEN",user.getToken())
+        ).andExpect(
+                status().isOk()
+        ).andDo(result -> {
+            User userResponse = objectMapper.readValue(result.getResponse().getContentAsString(), User.class);
+            assertEquals("test", userResponse.getUsername());
+        });
+    }
+
+    @Test
+    void testGetUserFailed() throws Exception {
+        mockMvc.perform(
+                get("/api/profile").header("X-API-TOKEN","dsadsadsa")
+        ).andExpect(
+                status().isUnauthorized()
+        );
+    }
+
 }
