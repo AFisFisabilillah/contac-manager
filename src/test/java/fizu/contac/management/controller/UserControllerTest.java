@@ -1,9 +1,12 @@
 package fizu.contac.management.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fizu.contac.management.entity.User;
 import fizu.contac.management.model.RegisterRequest;
+import fizu.contac.management.model.UpdateUserRequest;
+import fizu.contac.management.model.UserResponse;
 import fizu.contac.management.model.WebResponse;
 import fizu.contac.management.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -97,8 +100,8 @@ public class UserControllerTest {
     @Test
     void testGetUserSucces() throws Exception {
         User user = new User();
-        user.setName("test");
-        user.setUsername("test");
+        user.setName("test2");
+        user.setUsername("test2");
         user.setToken("test");
         user.setTokenExpiredAt(System.currentTimeMillis() + 1000000000000L);
         userRepository.save(user);
@@ -121,4 +124,24 @@ public class UserControllerTest {
         );
     }
 
+    @Test
+    void testUpdateProfielSucces()throws Exception{
+        User user = new User();
+        user.setName("test");
+        user.setUsername("test");
+        user.setToken("test");
+        user.setTokenExpiredAt(System.currentTimeMillis() + 1000000000000L);
+        userRepository.save(user);
+
+        UpdateUserRequest updateUserRequest = new UpdateUserRequest( "fizzz");
+        String requestJson = objectMapper.writeValueAsString(updateUserRequest);
+        mockMvc.perform(
+                patch("/api/profile/update").header("X-API-TOKEN",user.getToken()).content(requestJson).contentType(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andDo(result -> {
+           WebResponse<UserResponse> userResponse = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<WebResponse<UserResponse>>() {});
+            assertEquals("fizzz", userResponse.getData().getName());
+        });
+    }
 }

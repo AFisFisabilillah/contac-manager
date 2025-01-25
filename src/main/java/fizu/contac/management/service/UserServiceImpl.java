@@ -2,7 +2,9 @@ package fizu.contac.management.service;
 
 import fizu.contac.management.entity.User;
 import fizu.contac.management.model.RegisterRequest;
+import fizu.contac.management.model.UpdateUserRequest;
 import fizu.contac.management.model.UserResponse;
+import fizu.contac.management.model.WebResponse;
 import fizu.contac.management.repository.UserRepository;
 import fizu.contac.management.security.BCrypt;
 import jakarta.transaction.Transactional;
@@ -29,14 +31,13 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private ValidateService validation;
+
     @Transactional
     public void register(RegisterRequest request) {
-        Set<ConstraintViolation<RegisterRequest>> violations = validator.validate(request);
-        if(violations.size() > 0){
-            throw new ConstraintViolationException(violations);
-        }
 
-
+        validation.validation(request);
 
         User user = new User();
         user.setName(request.getName());
@@ -47,6 +48,22 @@ public class UserServiceImpl implements UserService{
 
     public UserResponse getUser(User user){
         return UserResponse.builder().name(user.getName()).username(user.getUsername()).build();
+    }
+
+
+
+    @Transactional
+    public UserResponse updateUser(User user, UpdateUserRequest request){
+        validation.validation(request);
+
+
+        if(request.getName() != null){
+            user.setName(request.getName());
+        }
+
+        userRepository.save(user);
+
+       return new UserResponse(user.getUsername(), user.getName());
     }
 
 
