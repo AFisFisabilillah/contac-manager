@@ -35,11 +35,12 @@ public class UserControllerTest {
 
     @BeforeEach
     void setUp() {
+        userRepository.deleteAll();
     }
 
     @Test
     void testRegisterSucces() throws Exception {
-        RegisterRequest request = RegisterRequest.builder().username("afisssssuuu").password("rahasia").name("afis Fisabilillah").build();
+        RegisterRequest request = RegisterRequest.builder().username("rudeus").password("rahasia").name("afis Fisabilillah").build();
         String s = objectMapper.writeValueAsString(request);
 
         mockMvc.perform(
