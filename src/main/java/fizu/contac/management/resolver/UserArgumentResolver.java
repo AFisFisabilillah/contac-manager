@@ -31,12 +31,12 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
         String token = request.getHeader("X-API-TOKEN");
         if(token == null){
-            throw  new ResponseStatusException(HttpStatus.UNAUTHORIZED, "belum Logi");
+            throw  new ResponseStatusException(HttpStatus.UNAUTHORIZED, "belum Login");
         }
 
         User user = userRepository.findByToken(token).orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unaotized"));
         if(user.getTokenExpiredAt() < System.currentTimeMillis()){
-            throw  new ResponseStatusException(HttpStatus.UNAUTHORIZED, "belum Logi");
+            throw  new ResponseStatusException(HttpStatus.UNAUTHORIZED, "token anda sudah habis");
         }
 
         return user ;
