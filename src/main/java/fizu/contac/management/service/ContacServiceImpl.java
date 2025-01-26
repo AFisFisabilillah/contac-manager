@@ -7,7 +7,9 @@ import fizu.contac.management.model.ContacResponse;
 import fizu.contac.management.repository.ContacRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
@@ -34,7 +36,16 @@ public class ContacServiceImpl implements ContacService{
         contac.setUser(user);
 
         contacRepository.save(contac);
-        return ContacResponse.builder()
+        return toContacResponse(contac);
+    }
+
+    public ContacResponse getContac(User user, String id){
+        Contac contac = contacRepository.findByUserAndId(user, id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "cotac dengan id " + id + " not found"));
+        return toContacResponse(contac);
+    }
+
+    private ContacResponse toContacResponse(Contac contac){
+       return ContacResponse.builder()
                 .email(contac.getEmail())
                 .id(contac.getId())
                 .firstname(contac.getFirstName())

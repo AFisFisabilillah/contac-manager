@@ -3,10 +3,13 @@ package fizu.contac.management.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fizu.contac.management.entity.Contac;
+import fizu.contac.management.entity.User;
 import fizu.contac.management.model.ContacRequest;
 import fizu.contac.management.model.ContacResponse;
 import fizu.contac.management.model.WebResponse;
 import fizu.contac.management.repository.ContacRepository;
+import fizu.contac.management.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +36,9 @@ class ContacControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @BeforeEach
     void setUp(){
@@ -90,6 +96,43 @@ class ContacControllerTest {
 
             System.out.println(result.getResponse().getContentAsString());
         });
+    }
+
+    @Test
+    public  void testGetContacSucces()throws Exception{
+        User user = userRepository.findById("test").orElseThrow();
+        Contac contac = new Contac();
+        contac.setId("2112");
+        contac.setFirstName("afis");
+        contac.setEmail("afis@gmail.com");
+        contac.setPhone("121212121");
+        contac.setUser(user);
+        contacRepository.save(contac);
+
+        mockMvc.perform(
+                get("/api/contac/2112")
+                        .header("X-API-TOKEN", user.getToken())
+        ).andExpect(
+                status().isOk()
+        ).andDo(result -> {
+            WebResponse<ContacResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<WebResponse<ContacResponse>>() {
+            });
+            assertEquals("berhasil menemukan contac dengan id "+response.getData().getId(), response.getMessage());
+        });
+
+    }
+
+    @Test
+    public  void testGetContacFailedNotFound()throws Exception{
+        User user = userRepository.findById("test").orElseThrow();
+
+        mockMvc.perform(
+                get("/api/contac/21wqewq12")
+                        .header("X-API-TOKEN", user.getToken())
+        ).andExpect(
+                status().isNotFound()
+        );
+
     }
 
 }
