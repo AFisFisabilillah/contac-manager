@@ -11,4 +11,5 @@ public interface ContacService {
     public ContacResponse create(User user, ContacRequest request);
     public ContacResponse getContac(User user, String id);
     public ContacResponse updateContac(User user, UpdateContacRequest request);
+    public void deleteContac(User user, String id);
 }

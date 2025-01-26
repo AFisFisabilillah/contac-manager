@@ -48,4 +48,13 @@ public class ContacController {
                 .data(contacService.updateContac(user,request))
                 .message("contac dengan id "+id+"berhasil di update").build();
     }
+
+    @DeleteMapping(
+            path = "/api/contac/{id}/delete",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponse<String>  deleteContac(User user, @PathVariable(name = "id") String id){
+        contacService.deleteContac(user, id);
+        return WebResponse.<String>builder().message("contac dengan id "+id+" berhasil di hapus").build();
+    }
 }

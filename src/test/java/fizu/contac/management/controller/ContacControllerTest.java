@@ -216,4 +216,47 @@ class ContacControllerTest {
             System.out.println(result.getResponse().getContentAsString());
         });
     }
+
+    @Test
+    public void testDeleteContacSucces()throws Exception{
+        User user = userRepository.findById("test").orElseThrow();
+        Contac contac = new Contac();
+        contac.setId("2112");
+        contac.setFirstName("afis");
+        contac.setEmail("afis@gmail.com");
+        contac.setPhone("121212121");
+        contac.setUser(user);
+        contacRepository.save(contac);
+
+        mockMvc.perform(
+                delete("/api/contac/2112/delete")
+                        .header("X-API-TOKEN", user.getToken())
+
+        ).andExpect(
+                status().isOk()
+        ).andDo(result -> {
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<WebResponse<String>>() {
+            });
+            assertEquals("contac dengan id "+contac.getId()+" berhasil di hapus", response.getMessage());
+        });
+    }
+
+    @Test
+    public void testDeleteContacFailedNotFound()throws Exception{
+        User user = userRepository.findById("test").orElseThrow();
+
+
+        mockMvc.perform(
+                delete("/api/contac/2112132/delete")
+                        .header("X-API-TOKEN", user.getToken())
+
+        ).andExpect(
+                status().isNotFound()
+        ).andDo(result -> {
+            System.out.println(result.getResponse().getContentAsString());
+        });
+    }
+
+
+
 }

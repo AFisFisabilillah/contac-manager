@@ -10,5 +10,5 @@ import java.util.Optional;
 @Repository
 public interface ContacRepository extends JpaRepository<Contac, String> {
     Optional<Contac> findByUserAndId(User user, String id);
-
+    long deleteByUserAndId(User user, String id);
 }

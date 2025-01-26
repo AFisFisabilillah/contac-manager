@@ -59,6 +59,12 @@ public class ContacServiceImpl implements ContacService{
          return toContacResponse(contac);
     }
 
+    @Transactional
+    public void deleteContac(User user, String id){
+        long data = contacRepository.deleteByUserAndId(user, id);
+        if( data == 0 ) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "DATA TIDAK DI TEMUKAN");
+    }
+
     private ContacResponse toContacResponse(Contac contac){
        return ContacResponse.builder()
                 .email(contac.getEmail())
@@ -67,4 +73,5 @@ public class ContacServiceImpl implements ContacService{
                 .lastname(contac.getLastName())
                 .phone(contac.getPhone()).build();
     }
+
 }
