@@ -7,4 +7,5 @@ import fizu.contac.management.model.UserResponse;
 
 public interface AuthService {
     public TokenResponse login(LoginRequest request);
+    public void logout(User user);
 }

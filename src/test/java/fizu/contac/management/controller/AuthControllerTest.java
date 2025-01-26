@@ -3,10 +3,12 @@ package fizu.contac.management.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.TypeRef;
+import fizu.contac.management.entity.User;
 import fizu.contac.management.model.ErrorResponse;
 import fizu.contac.management.model.LoginRequest;
 import fizu.contac.management.model.TokenResponse;
 import fizu.contac.management.model.WebResponse;
+import fizu.contac.management.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -27,8 +29,12 @@ class AuthControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
     @Autowired
     ObjectMapper objectMapper;
+
+    @Autowired
+    UserRepository userRepository;
 
     @Test
     public void testLoginSucces()throws Exception{
@@ -70,6 +76,42 @@ class AuthControllerTest {
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request)
+        ).andExpect(
+                status().isUnauthorized()
+        );
+    }
+
+    @Test
+    void testLogoutSucces() throws Exception {
+        User user = new User();
+        user.setName("test");
+        user.setUsername("test");
+        user.setToken("test");
+        user.setTokenExpiredAt(System.currentTimeMillis() + 1000000000000L);
+        userRepository.save(user);
+
+        mockMvc.perform(
+                delete("/api/user/logout")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-API-TOKEN", "test")
+
+        ).andExpect(
+                status().isOk()
+        ).andDo(result -> {
+            WebResponse<String> stringWebResponse = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<WebResponse<String>>() {
+            });
+            assertEquals("OK", stringWebResponse.getData());
+        });
+    }
+
+    @Test
+    void testLogoutFailed() throws Exception {
+
+
+        mockMvc.perform(
+                delete("/api/user/logout")
+                        .contentType(MediaType.APPLICATION_JSON)
+
         ).andExpect(
                 status().isUnauthorized()
         );
