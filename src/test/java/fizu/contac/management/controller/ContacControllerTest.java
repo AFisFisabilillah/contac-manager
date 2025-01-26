@@ -7,6 +7,7 @@ import fizu.contac.management.entity.Contac;
 import fizu.contac.management.entity.User;
 import fizu.contac.management.model.ContacRequest;
 import fizu.contac.management.model.ContacResponse;
+import fizu.contac.management.model.UpdateContacRequest;
 import fizu.contac.management.model.WebResponse;
 import fizu.contac.management.repository.ContacRepository;
 import fizu.contac.management.repository.UserRepository;
@@ -135,4 +136,84 @@ class ContacControllerTest {
 
     }
 
+
+    @Test
+    public void testUpdateContacSucces()throws Exception{
+        User user = userRepository.findById("test").orElseThrow();
+        Contac contac = new Contac();
+        contac.setId("2112");
+        contac.setFirstName("afis");
+        contac.setEmail("afis@gmail.com");
+        contac.setPhone("121212121");
+        contac.setUser(user);
+        contacRepository.save(contac);
+
+        UpdateContacRequest updateContacRequest = new UpdateContacRequest();
+        updateContacRequest.setFirstname("rudeus");
+        updateContacRequest.setLastname("Greyrat");
+        String requwst = objectMapper.writeValueAsString(updateContacRequest);
+
+        mockMvc.perform(
+                patch("/api/contac/2112/update")
+                        .header("X-API-TOKEN", user.getToken())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requwst)
+        ).andExpect(
+                status().isOk()
+        ).andDo(result -> {
+            WebResponse<ContacResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<WebResponse<ContacResponse>>() {
+            });
+            assertEquals(updateContacRequest.getFirstname(), response.getData().getFirstname());
+            assertEquals(updateContacRequest.getLastname(), response.getData().getLastname());
+        });
+    }
+
+    @Test
+    public void testUpdateContacFailedValidation()throws Exception{
+        User user = userRepository.findById("test").orElseThrow();
+        Contac contac = new Contac();
+        contac.setId("2112");
+        contac.setFirstName("afis");
+        contac.setEmail("afis@gmail.com");
+        contac.setPhone("121212121");
+        contac.setUser(user);
+        contacRepository.save(contac);
+
+        UpdateContacRequest updateContacRequest = new UpdateContacRequest();
+        updateContacRequest.setEmail("rudeus");
+        updateContacRequest.setPhone("432424323");
+        String requwst = objectMapper.writeValueAsString(updateContacRequest);
+
+        mockMvc.perform(
+                patch("/api/contac/2112/update")
+                        .header("X-API-TOKEN", user.getToken())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requwst)
+        ).andExpect(
+                status().isBadRequest()
+        ).andDo(result -> {
+            System.out.println(result.getResponse().getContentAsString());
+        });
+    }
+
+    @Test
+    public void testUpdateContacFailedNotFound()throws Exception{
+        User user = userRepository.findById("test").orElseThrow();
+
+        UpdateContacRequest updateContacRequest = new UpdateContacRequest();
+        updateContacRequest.setFirstname("rudeus");
+        updateContacRequest.setLastname("432424323");
+        String requwst = objectMapper.writeValueAsString(updateContacRequest);
+
+        mockMvc.perform(
+                patch("/api/contac/21113212/update")
+                        .header("X-API-TOKEN", user.getToken())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requwst)
+        ).andExpect(
+                status().isNotFound()
+        ).andDo(result -> {
+            System.out.println(result.getResponse().getContentAsString());
+        });
+    }
 }
