@@ -19,6 +19,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.MockMvcBuilder.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -256,6 +260,108 @@ class ContacControllerTest {
             System.out.println(result.getResponse().getContentAsString());
         });
     }
+    @Test
+    public void testSearchContcaSucces()throws Exception {
+        User user = userRepository.findById("test").orElseThrow();
+
+        mockMvc.perform(
+                get("/api/contacs")
+                        .header("X-API-TOKEN", user.getToken())
+
+        ).andExpect(
+                status().isOk()
+        ).andDo(result -> {
+            WebResponse<List<ContacResponse>> response= objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
+            assertEquals(0, response.getData().size());
+            assertEquals(0, response.getPaging().getCurrentPage());
+            assertEquals(10, response.getPaging().getSize());
+
+        });
+    }
+
+    @Test
+    public void testSearch()throws Exception{
+        User user = userRepository.findById("test").orElseThrow();
+        for(int i = 1; i <= 100; i++ ){
+            Contac contac = new Contac();
+            contac.setId(UUID.randomUUID().toString());
+            contac.setFirstName("afis "+i);
+            contac.setLastName("Fisabilillah");
+            contac.setEmail("afis@gmail.com");
+            contac.setUser(user);
+            contac.setPhone("0824324324324");
+            contacRepository.save(contac);
+        }
+
+        mockMvc.perform(
+                get("/api/contacs")
+                        .header("X-API-TOKEN", user.getToken())
+                        .param("name", "afis")
+
+        ).andExpect(
+                status().isOk()
+        ).andDo(result -> {
+            WebResponse<List<ContacResponse>> response= objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
+            assertEquals(10, response.getData().size());
+            assertEquals(0, response.getPaging().getCurrentPage());
+            assertEquals(10, response.getPaging().getSize());
+            assertEquals(10,response.getPaging().getTotalPage());
+
+        });
+
+        mockMvc.perform(
+                get("/api/contacs")
+                        .header("X-API-TOKEN", user.getToken())
+                        .param("name", "Fisabilillah")
+
+        ).andExpect(
+                status().isOk()
+        ).andDo(result -> {
+            WebResponse<List<ContacResponse>> response= objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
+            assertEquals(10, response.getData().size());
+            assertEquals(0, response.getPaging().getCurrentPage());
+            assertEquals(10, response.getPaging().getSize());
+            assertEquals(10,response.getPaging().getTotalPage());
+
+        });
+
+        mockMvc.perform(
+                get("/api/contacs")
+                        .header("X-API-TOKEN", user.getToken())
+                        .param("email", "afis@gmail.com")
+
+        ).andExpect(
+                status().isOk()
+        ).andDo(result -> {
+            WebResponse<List<ContacResponse>> response= objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
+            assertEquals(10, response.getData().size());
+            assertEquals(0, response.getPaging().getCurrentPage());
+            assertEquals(10, response.getPaging().getSize());
+            assertEquals(10,response.getPaging().getTotalPage());
+
+        });
+
+        mockMvc.perform(
+                get("/api/contacs")
+                        .header("X-API-TOKEN", user.getToken())
+                        .param("phone", "0824324324324")
+
+        ).andExpect(
+                status().isOk()
+        ).andDo(result -> {
+            WebResponse<List<ContacResponse>> response= objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
+            assertEquals(10, response.getData().size());
+            assertEquals(0, response.getPaging().getCurrentPage());
+            assertEquals(10, response.getPaging().getSize());
+            assertEquals(10,response.getPaging().getTotalPage());
+
+        });
+
+
+    }
+
+
+
 
 
 
