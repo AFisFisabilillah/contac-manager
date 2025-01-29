@@ -254,6 +254,34 @@ class AddressControllerTest {
 
     }
 
+    @Test
+    void testGetListAddressFailedNotFound()throws Exception{
+        User user = userRepository.findById("test").orElseThrow();
+
+        Contac contac = contacRepository.findByUserAndId(user, "test").orElseThrow();
+
+        Address address = new Address();
+        address.setId("test");
+        address.setCountry("indonesia");
+        address.setProvince("jwa barat");
+        address.setCity("bogor");
+        address.setStreet("jln bogor raya");
+        address.setContac(contac);
+        addresRepository.save(address);
+
+
+        mockMvc.perform(
+                get("/api/contac/test/address")
+                        .header("X-API-TOKEN", user.getToken())
+                        .accept(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andDo(result ->{
+            System.out.println(result.getResponse().getContentAsString());
+        });
+
+    }
+
 
 
 }

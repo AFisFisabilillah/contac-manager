@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import javax.print.attribute.standard.Media;
+import java.util.List;
 
 @RestController
 public class AddressController {
@@ -50,4 +51,17 @@ public class AddressController {
     public WebResponse<AddresResponse> getAddres(User user , @PathVariable(name="idContac") String idContac, @PathVariable(name = "idAddres") String idAddres){
         return WebResponse.<AddresResponse>builder().data(addresService.getAddres(user,idContac, idAddres)).message("berhasil medapatkan addres dengann id "+idAddres).build();
     }
+
+    @GetMapping(
+            path = "/api/contac/{idContac}/address",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponse<List<AddresResponse>> listAddres(User user , @PathVariable(name="idContac") String idContac){
+        return WebResponse.<List<AddresResponse>>builder()
+                .data(addresService.listAddres(user,idContac))
+                .message("berhasil medapatkan addres dengann dari contac dengan  id "+idContac)
+                .build();
+    }
+
+
 }

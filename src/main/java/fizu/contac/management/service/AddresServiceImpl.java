@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -66,6 +67,13 @@ public class AddresServiceImpl implements AddresService{
         Contac contac = contacRepository.findByUserAndId(user, idContac).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Maaf id contac  tidak ketemu"));
         Address address = addresRepository.findByContacAndId(contac, idAddres).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Maaf id addres tidak ketemu"));
         return  toAddresResponse(address);
+    }
+
+    @Transactional(readOnly = true)
+    public List<AddresResponse> listAddres(User user, String idContac){
+        Contac contac = contacRepository.findByUserAndId(user, idContac).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Maaf id contac  tidak ketemu"));
+        List<Address> addresses = contac.getAddresses();
+        return addresses.stream().map(this::toAddresResponse).toList();
     }
 
     private AddresResponse toAddresResponse(Address address){
