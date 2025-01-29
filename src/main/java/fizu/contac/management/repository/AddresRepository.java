@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface AddresRepository extends JpaRepository<Address, String> {
-    Optional<Address> findByContac_IdAndIdAndContac_User(String idContac, String id, User user);
 
+    Optional<Address> findByContac_IdAndIdAndContac_User(String idContac, String id, User user);
+    Optional<Address> findByContacAndId(Contac contac, String id);
 }

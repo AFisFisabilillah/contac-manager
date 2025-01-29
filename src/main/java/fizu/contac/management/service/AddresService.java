@@ -8,4 +8,5 @@ import fizu.contac.management.model.UpdateAddresRequest;
 public interface AddresService {
     public AddresResponse createAddres(User user, CreateAddresRequest request);
     public AddresResponse updateAddres(User user, UpdateAddresRequest request);
+    public AddresResponse getAddres(User user, String idContac, String idAddres);
 }

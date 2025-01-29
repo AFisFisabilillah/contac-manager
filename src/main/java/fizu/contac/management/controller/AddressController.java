@@ -43,4 +43,11 @@ public class AddressController {
 
         return WebResponse.<AddresResponse>builder().message("berhasil update address dengan id "+addres.getId()).data(addres).build();
     }
+    @GetMapping(
+            path = "/api/contac/{idContac}/address/{idAddres}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public WebResponse<AddresResponse> getAddres(User user , @PathVariable(name="idContac") String idContac, @PathVariable(name = "idAddres") String idAddres){
+        return WebResponse.<AddresResponse>builder().data(addresService.getAddres(user,idContac, idAddres)).message("berhasil medapatkan addres dengann id "+idAddres).build();
+    }
 }

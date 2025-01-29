@@ -129,7 +129,7 @@ class AddressControllerTest {
             assertEquals(response.getData().getCountry(), requestAddres.getCountry());
             assertEquals(response.getData().getProvince(), requestAddres.getProvince());
             assertEquals(response.getData().getStreet(), requestAddres.getStreet());
-        });;
+        });
 
     }
 
@@ -192,6 +192,65 @@ class AddressControllerTest {
         ).andExpect(
                 status().isNotFound()
         );
+
+    }
+
+    @Test
+    void testGetAddressSucces()throws Exception{
+        User user = userRepository.findById("test").orElseThrow();
+
+        Contac contac = contacRepository.findByUserAndId(user, "test").orElseThrow();
+
+        Address address = new Address();
+        address.setId("test");
+        address.setCountry("indonesia");
+        address.setProvince("jwa barat");
+        address.setCity("bogor");
+        address.setStreet("jln bogor raya");
+        address.setContac(contac);
+        addresRepository.save(address);
+
+        mockMvc.perform(
+                get("/api/contac/test/address/test")
+                        .header("X-API-TOKEN", user.getToken())
+                        .accept(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andDo(result ->{
+            WebResponse<AddresResponse> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<WebResponse<AddresResponse>>() {
+            });
+            assertEquals(response.getData().getCity(), address.getCity());
+            assertEquals(response.getData().getCountry(), address.getCountry());
+            assertEquals(response.getData().getProvince(), address.getProvince());
+            assertEquals(response.getData().getStreet(), address.getStreet());
+        });
+
+    }
+
+    @Test
+    void testGetAddressFailedNotFound()throws Exception{
+        User user = userRepository.findById("test").orElseThrow();
+
+        Contac contac = contacRepository.findByUserAndId(user, "test").orElseThrow();
+
+        Address address = new Address();
+        address.setId("test");
+        address.setCountry("indonesia");
+        address.setProvince("jwa barat");
+        address.setCity("bogor");
+        address.setStreet("jln bogor raya");
+        address.setContac(contac);
+        addresRepository.save(address);
+
+        mockMvc.perform(
+                get("/api/contac/ewqew13213131/address/test")
+                        .header("X-API-TOKEN", user.getToken())
+                        .accept(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isNotFound()
+        ).andDo(result ->{
+            System.out.println(result.getResponse().getContentAsString());
+        });
 
     }
 

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -45,10 +46,11 @@ public class AddresServiceImpl implements AddresService{
         return  toAddresResponse(address);
     }
 
+    @Transactional
     public AddresResponse updateAddres(User user, UpdateAddresRequest request){
         validation.validation(request);
-        Address address = addresRepository.findByContac_IdAndIdAndContac_User(request.getId_contac(), request.getIdAddres(),user).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Maaf id contac atau id addres tidak ketemu"));
-
+        Contac contac = contacRepository.findByUserAndId(user, request.getId_contac()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Maaf id contac  tidak ketemu"));
+        Address address = addresRepository.findByContacAndId(contac, request.getIdAddres()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Maaf id addres tidak ketemu"));
         if(request.getCountry()!= null) address.setCountry(request.getCountry());
         if(request.getProvince()!= null) address.setProvince(request.getProvince());
         if(request.getCity()!= null) address.setCity(request.getCity());
@@ -57,6 +59,13 @@ public class AddresServiceImpl implements AddresService{
         addresRepository.save(address);
 
         return toAddresResponse(address);
+    }
+
+    @Transactional(readOnly = true)
+    public AddresResponse getAddres(User user, String idContac, String idAddres){
+        Contac contac = contacRepository.findByUserAndId(user, idContac).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Maaf id contac  tidak ketemu"));
+        Address address = addresRepository.findByContacAndId(contac, idAddres).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Maaf id addres tidak ketemu"));
+        return  toAddresResponse(address);
     }
 
     private AddresResponse toAddresResponse(Address address){
