@@ -282,6 +282,59 @@ class AddressControllerTest {
 
     }
 
+    @Test
+    void testDeleteAddresSucces()throws Exception{
+        User user = userRepository.findById("test").orElseThrow();
+
+        Contac contac = contacRepository.findByUserAndId(user, "test").orElseThrow();
+
+        Address address = new Address();
+        address.setId("test");
+        address.setCountry("anjay");
+        address.setProvince("anjay");
+        address.setCity("anjay");
+        address.setStreet("anjay");
+        address.setContac(contac);
+        addresRepository.save(address);
+
+        mockMvc.perform(
+                delete("/api/contac/test/address/test")
+                        .header("X-API-TOKEN", user.getToken())
+                        .accept(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isOk()
+        ).andDo(result ->{
+            System.out.println(result.getResponse().getContentAsString());
+            WebResponse<String> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<WebResponse<String>>() {
+            });
+            assertEquals("Berhasi menghapus addres dengan id test",response.getMessage() );
+        });
+    }
+
+    @Test
+    void testDeleteAddresFailed()throws Exception{
+        User user = userRepository.findById("test").orElseThrow();
+
+        Contac contac = contacRepository.findByUserAndId(user, "test").orElseThrow();
+
+        Address address = new Address();
+        address.setId("test");
+        address.setCountry("anjay");
+        address.setProvince("anjay");
+        address.setCity("anjay");
+        address.setStreet("anjay");
+        address.setContac(contac);
+        addresRepository.save(address);
+
+        mockMvc.perform(
+                delete("/api/contac/te321st/address/132")
+                        .header("X-API-TOKEN", user.getToken())
+                        .accept(MediaType.APPLICATION_JSON)
+        ).andExpect(
+                status().isNotFound()
+        );
+    }
+
 
 
 }

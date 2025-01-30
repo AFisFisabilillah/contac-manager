@@ -13,4 +13,5 @@ public interface AddresService {
     public AddresResponse updateAddres(User user, UpdateAddresRequest request);
     public AddresResponse getAddres(User user, String idContac, String idAddres);
     public List<AddresResponse> listAddres(User user, String idContac);
+    public void deleteAddres(User user , String idAddres, String idContac);
 }

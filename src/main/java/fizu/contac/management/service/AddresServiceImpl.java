@@ -76,6 +76,17 @@ public class AddresServiceImpl implements AddresService{
         return addresses.stream().map(this::toAddresResponse).toList();
     }
 
+    @Transactional()
+    public void deleteAddres(User user,String idAddres , String idContac){
+        Contac contac = contacRepository.findByUserAndId(user, idContac).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Maaf id contac  tidak ketemu"));
+
+        Integer isSucces = addresRepository.deleteByContacAndId(contac, idAddres);
+        if(isSucces == 0){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "maaf idAddres tidak di temukan ");
+        }
+    }
+
+
     private AddresResponse toAddresResponse(Address address){
         return AddresResponse.builder()
                 .id(address.getId())

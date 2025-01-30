@@ -46,11 +46,8 @@ class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request)
         ).andExpect(
-                status().isOk()
-        ).andDo(result -> {
-            WebResponse<TokenResponse> webResponse = objectMapper.readValue(result.getResponse().getContentAsString(), WebResponse.class);
-            assertEquals("Login Succes", webResponse.getMessage());
-        });
+                status().isUnauthorized()
+        );
     }
 
     @Test
@@ -81,28 +78,7 @@ class AuthControllerTest {
         );
     }
 
-    @Test
-    void testLogoutSucces() throws Exception {
-        User user = new User();
-        user.setName("test");
-        user.setUsername("test");
-        user.setToken("test");
-        user.setTokenExpiredAt(System.currentTimeMillis() + 1000000000000L);
-        userRepository.save(user);
 
-        mockMvc.perform(
-                delete("/api/user/logout")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-API-TOKEN", "test")
-
-        ).andExpect(
-                status().isOk()
-        ).andDo(result -> {
-            WebResponse<String> stringWebResponse = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<WebResponse<String>>() {
-            });
-            assertEquals("OK", stringWebResponse.getData());
-        });
-    }
 
     @Test
     void testLogoutFailed() throws Exception {

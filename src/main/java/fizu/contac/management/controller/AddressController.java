@@ -63,5 +63,20 @@ public class AddressController {
                 .build();
     }
 
+    @DeleteMapping(
+            path = "/api/contac/{idContac}/address/{idAddres}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public  WebResponse<String> deleteAddres(User user,
+                                             @PathVariable(name = "idContac") String idContac,
+                                             @PathVariable(name = "idAddres") String idAddres
+                                             )
+    {
+        addresService.deleteAddres(user, idAddres, idContac);
+        return WebResponse.<String>builder()
+                .message("Berhasi menghapus addres dengan id "+idAddres)
+                .build();
+    }
+
 
 }
