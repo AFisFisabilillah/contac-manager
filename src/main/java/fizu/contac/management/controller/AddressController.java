@@ -5,9 +5,9 @@ import fizu.contac.management.model.*;
 import fizu.contac.management.service.AddresService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import javax.print.attribute.standard.Media;
 import java.util.List;
 
 @RestController
@@ -21,7 +21,7 @@ public class AddressController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<AddresResponse> createAddres(User user, @PathVariable(name = "id") String id, @RequestBody CreateAddresRequest request){
+    public WebResponse<AddresResponse> createAddres(@AuthenticationPrincipal User user, @PathVariable(name = "id") String id, @RequestBody CreateAddresRequest request){
         request.setId_contac(id);
         AddresResponse addres = addresService.createAddres(user,request );
 
@@ -33,7 +33,7 @@ public class AddressController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<AddresResponse> updateAddres(User user,
+    public WebResponse<AddresResponse> updateAddres(@AuthenticationPrincipal User user,
                                                     @PathVariable(name = "id") String id,
                                                     @PathVariable(name = "idAddres") String idAddres,
                                                     @RequestBody UpdateAddresRequest request
@@ -48,7 +48,7 @@ public class AddressController {
             path = "/api/contac/{idContac}/address/{idAddres}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<AddresResponse> getAddres(User user , @PathVariable(name="idContac") String idContac, @PathVariable(name = "idAddres") String idAddres){
+    public WebResponse<AddresResponse> getAddres(@AuthenticationPrincipal User user , @PathVariable(name="idContac") String idContac, @PathVariable(name = "idAddres") String idAddres){
         return WebResponse.<AddresResponse>builder().data(addresService.getAddres(user,idContac, idAddres)).message("berhasil medapatkan addres dengann id "+idAddres).build();
     }
 
@@ -56,7 +56,7 @@ public class AddressController {
             path = "/api/contac/{idContac}/address",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public WebResponse<List<AddresResponse>> listAddres(User user , @PathVariable(name="idContac") String idContac){
+    public WebResponse<List<AddresResponse>> listAddres(@AuthenticationPrincipal User user , @PathVariable(name="idContac") String idContac){
         return WebResponse.<List<AddresResponse>>builder()
                 .data(addresService.listAddres(user,idContac))
                 .message("berhasil medapatkan addres dengann dari contac dengan  id "+idContac)
@@ -67,7 +67,7 @@ public class AddressController {
             path = "/api/contac/{idContac}/address/{idAddres}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public  WebResponse<String> deleteAddres(User user,
+    public  WebResponse<String> deleteAddres(@AuthenticationPrincipal User user,
                                              @PathVariable(name = "idContac") String idContac,
                                              @PathVariable(name = "idAddres") String idAddres
                                              )
