@@ -4,23 +4,25 @@ package fizu.contac.management.service;
 import fizu.contac.management.entity.User;
 import fizu.contac.management.model.LoginRequest;
 import fizu.contac.management.model.TokenResponse;
-import fizu.contac.management.model.UserResponse;
 import fizu.contac.management.repository.UserRepository;
 import fizu.contac.management.security.BCrypt;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class AuthServiceImpl implements AuthService{
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private ValidateService validateService;
+    private final UserRepository userRepository;
+    private final ValidateService validateService;
+
+    public AuthServiceImpl(UserRepository userRepository, ValidateService validateService) {
+        this.userRepository = userRepository;
+        this.validateService = validateService;
+    }
 
     @Transactional
     public TokenResponse login(LoginRequest request){
@@ -45,6 +47,6 @@ public class AuthServiceImpl implements AuthService{
 
 
     private Long next30Days(){
-        return System.currentTimeMillis()+ 1000*60*24*30;
+        return System.currentTimeMillis() + TimeUnit.DAYS.toMillis(30);
     }
 }

@@ -10,6 +10,5 @@ import java.util.Optional;
 public interface AddresRepository extends JpaRepository<Address, String> {
 
     Optional<Address> findByContac_IdAndIdAndContac_User(String idContac, String id, User user);
-    Optional<Address> findByContacAndId(Contac contac, String id);
     Integer deleteByContacAndId(Contac contac, String id);
 }
